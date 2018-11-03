@@ -170,30 +170,30 @@ static int SelectPhotoImage(){
 				printf("INFO: GetStatus : 0x%08X\n", ret);
 		}
 
-		ScePhotoImportDialogResult pidResult;
+		ScePhotoImportDialogResult result;
 
-		memset( &pidResult, 0x0, sizeof(ScePhotoImportDialogResult) );
-		scePhotoImportDialogGetResult(&pidResult);
+		memset( &result, 0x0, sizeof(ScePhotoImportDialogResult) );
+		scePhotoImportDialogGetResult(&result);
 
 
-		if (pidResult.result == SCE_COMMON_DIALOG_RESULT_OK) {
-			for (int i = 0; i < pidResult.importedItemNum && i < SCE_PHOTOIMPORT_DIALOG_MAX_ITEM_NUM; ++i) {
+		if (result.result == SCE_COMMON_DIALOG_RESULT_OK) {
+			for (int i = 0; i < result.importedItemNum && i < SCE_PHOTOIMPORT_DIALOG_MAX_ITEM_NUM; ++i) {
 
 				printf("[info] path   : %s\n", s_itemData[i].fileData.fileName);
 				printf("[info] format : %s\n", get_format_type_string(s_itemData[i].dataSub.format) );
 
 			}
-		}else if (pidResult.result == SCE_COMMON_DIALOG_RESULT_USER_CANCELED){
+		}else if (result.result == SCE_COMMON_DIALOG_RESULT_USER_CANCELED){
 
 			printf("[info] User canceled.\n");
 
-		}else if (pidResult.result == SCE_COMMON_DIALOG_RESULT_ABORTED){
+		}else if (result.result == SCE_COMMON_DIALOG_RESULT_ABORTED){
 
 			printf("[info] Aborted.\n");
 
 		}
 
-		ret = pidResult.result;
+		ret = result.result;
 
 		scePhotoImportDialogTerm();
 
@@ -210,8 +210,17 @@ int main(int argc, char *argv[]) {
 	vita2d_init();
 	psvDebugScreenInit();
 
-	sceAppUtilInit(&(SceAppUtilInitParam){}, &(SceAppUtilBootParam){});
-	sceCommonDialogSetConfigParam(&(SceCommonDialogConfigParam){});
+	SceAppUtilInitParam init_param;
+	SceAppUtilBootParam boot_param;
+	memset(&init_param, 0, sizeof(SceAppUtilInitParam));
+	memset(&boot_param, 0, sizeof(SceAppUtilBootParam));
+	sceAppUtilInit(&init_param, &boot_param);
+
+	SceCommonDialogConfigParam config;
+	sceCommonDialogConfigParamInit(&config);
+	sceAppUtilSystemParamGetInt(SCE_SYSTEM_PARAM_ID_LANG, (int *)&config.language);
+	sceAppUtilSystemParamGetInt(SCE_SYSTEM_PARAM_ID_ENTER_BUTTON, (int *)&config.enterButtonAssign);
+	sceCommonDialogSetConfigParam(&config);
 
 	int ret = 0;
 	int count[3];
@@ -288,6 +297,7 @@ int main(int argc, char *argv[]) {
 		}
 
 		vita2d_draw_texture(s_image, 0, 0);
+		sceKernelDelayThread(3*1000*1000);
 
 		vita2d_end_drawing();
 		vita2d_swap_buffers();
@@ -321,6 +331,8 @@ int main(int argc, char *argv[]) {
 		sceIoClose(fd);
 
 		sceKernelFreeMemBlock(new_image_work);
+
+		sceKernelDelayThread(2*1000*1000);
 
 		break;
 	}
