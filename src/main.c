@@ -170,30 +170,30 @@ static int SelectPhotoImage(){
 				printf("INFO: GetStatus : 0x%08X\n", ret);
 		}
 
-		ScePhotoImportDialogResult result;
+		ScePhotoImportDialogResult pidResult;
 
-		memset( &result, 0x0, sizeof(ScePhotoImportDialogResult) );
-		scePhotoImportDialogGetResult(&result);
+		memset( &pidResult, 0x0, sizeof(ScePhotoImportDialogResult) );
+		scePhotoImportDialogGetResult(&pidResult);
 
 
-		if (result.result == SCE_COMMON_DIALOG_RESULT_OK) {
-			for (int i = 0; i < result.importedItemNum && i < SCE_PHOTOIMPORT_DIALOG_MAX_ITEM_NUM; ++i) {
+		if (pidResult.result == SCE_COMMON_DIALOG_RESULT_OK) {
+			for (int i = 0; i < pidResult.importedItemNum && i < SCE_PHOTOIMPORT_DIALOG_MAX_ITEM_NUM; ++i) {
 
 				printf("[info] path   : %s\n", s_itemData[i].fileData.fileName);
 				printf("[info] format : %s\n", get_format_type_string(s_itemData[i].dataSub.format) );
 
 			}
-		}else if (result.result == SCE_COMMON_DIALOG_RESULT_USER_CANCELED){
+		}else if (pidResult.result == SCE_COMMON_DIALOG_RESULT_USER_CANCELED){
 
 			printf("[info] User canceled.\n");
 
-		}else if (result.result == SCE_COMMON_DIALOG_RESULT_ABORTED){
+		}else if (pidResult.result == SCE_COMMON_DIALOG_RESULT_ABORTED){
 
 			printf("[info] Aborted.\n");
 
 		}
 
-		ret = result.result;
+		ret = pidResult.result;
 
 		scePhotoImportDialogTerm();
 
