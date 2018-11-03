@@ -210,8 +210,17 @@ int main(int argc, char *argv[]) {
 	vita2d_init();
 	psvDebugScreenInit();
 
-	sceAppUtilInit(&(SceAppUtilInitParam){}, &(SceAppUtilBootParam){});
-	sceCommonDialogSetConfigParam(&(SceCommonDialogConfigParam){});
+	SceAppUtilInitParam init_param;
+	SceAppUtilBootParam boot_param;
+	memset(&init_param, 0, sizeof(SceAppUtilInitParam));
+	memset(&boot_param, 0, sizeof(SceAppUtilBootParam));
+	sceAppUtilInit(&init_param, &boot_param);
+
+	SceCommonDialogConfigParam config;
+	sceCommonDialogConfigParamInit(&config);
+	sceAppUtilSystemParamGetInt(SCE_SYSTEM_PARAM_ID_LANG, (int *)&config.language);
+	sceAppUtilSystemParamGetInt(SCE_SYSTEM_PARAM_ID_ENTER_BUTTON, (int *)&config.enterButtonAssign);
+	sceCommonDialogSetConfigParam(&config);
 
 	int ret = 0;
 	int count[3];
@@ -288,6 +297,7 @@ int main(int argc, char *argv[]) {
 		}
 
 		vita2d_draw_texture(s_image, 0, 0);
+		sceKernelDelayThread(3*1000*1000);
 
 		vita2d_end_drawing();
 		vita2d_swap_buffers();
@@ -321,6 +331,8 @@ int main(int argc, char *argv[]) {
 		sceIoClose(fd);
 
 		sceKernelFreeMemBlock(new_image_work);
+
+		sceKernelDelayThread(2*1000*1000);
 
 		break;
 	}
